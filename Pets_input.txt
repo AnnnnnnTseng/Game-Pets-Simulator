@@ -1,0 +1,6 @@
+R Lola 3
+R Flopsy 4
+R Miffy 1
+D Abby 5
+D Luna 10
+D Cooper 12
