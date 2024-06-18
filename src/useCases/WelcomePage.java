@@ -55,6 +55,7 @@ public class WelcomePage {
         System.out.println("2 - Add food to pet food pantry");
         System.out.println("3 - Show pet food pantry");
         System.out.println("4 - Feed Pets (You Can Feed Multiple Pets At The Same Time)");
+        System.out.println("5 - Feed (one of) a pet with the lowest energy level.");
         System.out.println("9 - Quit");
     }
 
@@ -80,17 +81,18 @@ public class WelcomePage {
     }
 
     public static void showPantry() {
-        System.out.println("_____________Food List_____________");
         System.out.println();
         // Access all instances stored in thePetFoodProductInstances
         System.out.println("All Pet Food Products available:");
+        System.out.println("--------------------------Food List--------------------------");
         for (PetFoodProduct p : PetFoodProduct.thePetFoodProductInstances) {
             p.describe();
         }
+        System.out.println("-------------------------------------------------------------");
         System.out.println();
     }
 
-    public static void feedPet(String chosenPetName) {
+    public static void feedPet(GetPetsInputUseCase getPets, String chosenPetName, String url) throws SQLException {
         // Find the chosen pet in theFacadePet list
         FacadePet chosenPet = null;
         for (FacadePet pet : FacadePet.FacadePetInstances) {
@@ -104,14 +106,14 @@ public class WelcomePage {
         if (chosenPet != null) {
             if (chosenPet instanceof Dog) {
                 Dog chosenDog = (Dog) chosenPet;
-                System.out.println("You want to feed dog " + chosenDog.getName());
+                System.out.println("Ready to feed dog " + chosenPetName);
                 showPantry();
                 InteractWith<Dog> DogInteraction = new InteractWith<>(chosenDog);
                 ParadiseMayor.theParadiseMayor.FeedPet(DogInteraction);
                 ParadiseMayor.theParadiseMayor.ObservePets(DogInteraction);
             } else if (chosenPet instanceof Rabbit) {
                 Rabbit chosenRabbit = (Rabbit) chosenPet;
-                System.out.println("You want to feed rabbit " + chosenRabbit.getName());
+                System.out.println("Ready to feed rabbit " + chosenPetName);
                 showPantry();
                 InteractWith<Rabbit> RabbitInteraction = new InteractWith<>(chosenRabbit);
                 ParadiseMayor.theParadiseMayor.FeedPet(RabbitInteraction);
@@ -121,14 +123,15 @@ public class WelcomePage {
         } else {
             System.out.println("Sorry, the specified dog does not exist.");
         }
+        getPets.updateDatabaseWithDefaults(getPets.petsInstances, url);
     }
 
-    public static void menu(GetPetsInputUseCase getPets, WelcomePage page, String PPPName, String url) throws IOException {
+    public static void menu(GetPetsInputUseCase getPets, WelcomePage page, String PPPName, String url) throws IOException, SQLException {
         Scanner scanner = new Scanner(System.in);
         boolean notQuit = true;
 
         while (notQuit) {
-            System.out.println("Welcome to " + PPPName + " Pet Pals Paradise!");
+            System.out.println("[ Welcome to " + PPPName + " Pet Pals Paradise! ]");
             printMenu();
 
             System.out.print("What is your choice? ");
@@ -182,16 +185,14 @@ public class WelcomePage {
                         if (toFeed.equalsIgnoreCase("Y")) {
                             // Prompt the user to choose which dog to feed
                             System.out.println("Which pet do you want to feed?");
-                            System.out.println("___________________________________");
-                            System.out.println();
-                            System.out.println("_____________Pet List_____________");
+
                             showPets(getPets, url);
 
                             System.out.println();
                             String chosenPetName = scanner.nextLine();
 
 //                            chosenPetNames.add(chosenPetName);
-                            feedPet(chosenPetName);
+                            feedPet(getPets, chosenPetName, url);
                         } else {
                             System.out.print("Finish choosing pets to feed. Start Feeding!");
                             break;
@@ -202,6 +203,19 @@ public class WelcomePage {
 //                        feedPet(chosenPetName);
 //                    }
                     continue;
+                case 5:
+                    System.out.println("You chose " + choice + " - Feed (one of) a pet with the lowest energy level.");
+                    // Get the pet name with the minimum energy level
+                    String petName = getPets.getPetWithMinEnergyLevel(url);
+                    // Check if a pet was found and feed it
+                    if (petName != null) {
+                        System.out.println( "[ " + petName + " ] has the lowest energy level: ");
+                        feedPet(getPets, petName, url);
+                    } else {
+                        System.out.println("No pets found in the paradise.");
+                    }
+                    continue;
+
                 default:
                     System.out.println("That's not a valid selection.");
             }
@@ -211,7 +225,7 @@ public class WelcomePage {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         //path to Database
         String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/Database/PPP_DB.db";
 

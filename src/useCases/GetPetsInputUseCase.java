@@ -15,9 +15,6 @@ public class GetPetsInputUseCase {
     // List store all pets input instances
     ArrayList<FacadePet> petsInstances = new ArrayList<>();
 
-    //ShowExistingPet method usage
-    private List<String> petDetails = new ArrayList<>();
-
 //    public static final String fileName = "Pets_input.txt";
 
     //constructor
@@ -45,7 +42,7 @@ public class GetPetsInputUseCase {
 //    }
 
     // read from Database, and create instances for dog/rabbits
-    public void readFromDatabase(Connection conn) throws SQLException {
+    public void readFromDatabase(Connection conn, String url) throws SQLException {
         String querySQL = "SELECT PetName, type, age FROM FacadePet ORDER BY age";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(querySQL)) {
@@ -63,6 +60,28 @@ public class GetPetsInputUseCase {
                 }
             }
         }
+        // Update database with default values
+        updateDatabaseWithDefaults(petsInstances, url);
+    }
+
+    public void updateDatabaseWithDefaults(ArrayList<FacadePet> petsInstances, String url) throws SQLException {
+    String updateSQL = "UPDATE FacadePet SET mood = ?, energyLevel = ?, gramsPerFeed = ? WHERE PetName = ?";
+        try (Connection conn = DriverManager.getConnection(url)) {
+            // Set the busy timeout to 30 seconds
+            if (conn.isValid(0)) {
+                conn.createStatement().execute("PRAGMA busy_timeout = 30000");
+            }
+            PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+            for (FacadePet pet : petsInstances) {
+                pstmt.setInt(1, pet.getMood());
+                pstmt.setInt(2, pet.getEnergyLevel());
+                pstmt.setInt(3, pet.getGramsPerFeed());
+                pstmt.setString(4, pet.getPetName());
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     public void LoadPets(GetPetsInputUseCase useDatabase, String url) {
@@ -74,7 +93,7 @@ public class GetPetsInputUseCase {
             }
 
             // Create an instance of UseDatabase and read data from database
-            useDatabase.readFromDatabase(conn);
+            useDatabase.readFromDatabase(conn, url);
 
             //Optionally, print the loaded pets
             for (FacadePet pet : useDatabase.petsInstances) {
@@ -88,6 +107,8 @@ public class GetPetsInputUseCase {
     }
 
     public void showExistingPets (Connection conn, GetPetsInputUseCase useDatabase, String url) throws IOException {
+        //ShowExistingPet method usage
+        List<String> petDetails = new ArrayList<>();
 //        GetPetsInputUseCase useCase = new GetPetsInputUseCase();
 //        useCase.readTextFile(fileName);
 //
@@ -114,7 +135,7 @@ public class GetPetsInputUseCase {
 //        }
 
         //Select all pets name and age from Facadepet table and match petType ID with AnimalPet that has same id in petType table
-        String querySQL = "SELECT FacadePet.PetName, FacadePet.age, PetType.AnimalType " +
+        String querySQL = "SELECT FacadePet.PetName, FacadePet.age, FacadePet.energyLevel, PetType.AnimalType " +
                   "FROM FacadePet " +
                   "JOIN PetType ON FacadePet.type = PetType.TypeId";
         try (Statement stmt = conn.createStatement();
@@ -122,23 +143,40 @@ public class GetPetsInputUseCase {
             while (rs.next()) {
                 String petName = rs.getString("PetName");
                 int petAge = rs.getInt("age");
+                int energyLevel = rs.getInt("energyLevel");
                 String animalType = rs.getString("AnimalType");
-                petDetails.add("| Pet Name: " + petName + " Type: " + animalType + " Age: " + petAge + " |");
+                petDetails.add("| Pet Name: " + petName + " Type: " + animalType + " Age: " + petAge + " Energy Level: " + energyLevel + " |");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
 
         // print a existing pets table
-        System.out.println("----------------------------------------");
-        for (String detail : useDatabase.petDetails) {
+        System.out.println("------------------------Pet List------------------------");
+        for (String detail : petDetails) {
                 System.out.println(detail);
         }
-        System.out.println("----------------------------------------");
-
-
-
+        System.out.println("-------------------------------------------------------");
     }
+
+    public static String getPetWithMinEnergyLevel(String url) {
+        String minEnergySQL = "SELECT PetName FROM FacadePet " +
+                              "WHERE energyLevel = (SELECT MIN(energyLevel) FROM FacadePet)";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(minEnergySQL)) {
+
+            if (rs.next()) {
+                return rs.getString("PetName");
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     public static void main(String[] args) throws IOException {
 
 //        //Read from DB
