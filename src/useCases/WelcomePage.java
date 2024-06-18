@@ -10,11 +10,13 @@ import users.ParadiseMayor;
 import java.io.IOException;
 import java.util.Scanner;
 
+import java.sql.*;
+
 public class WelcomePage {
     public WelcomePage() {
     }
 
-    public static void loadData(GetPetsInputUseCase useCase) throws IOException {
+    public static void loadData(GetPetsInputUseCase getPets, String url) throws IOException {
         Scanner scanner = new Scanner(System.in);
 //        System.out.print("Please do load data before proceeding. Loading now? (Y/N) ");
 //        String choice = scanner.nextLine();
@@ -25,9 +27,11 @@ public class WelcomePage {
             if (toLoad.equalsIgnoreCase("Y")) {
                 System.out.println("You chose " + toLoad + " - Load Data.");
                 System.out.println();
-                useCase.readTextFile(GetPetsInputUseCase.fileName);
+//                getPets.readTextFile(GetPetsInputUseCase.fileName);
+//                getPets.readFromDatabase();
+                getPets.LoadPets(getPets, url);
                 System.out.println("[ Finish Reading Existing Pets ]");
-                System.out.println("Total Pets: " + useCase.petsInstances.size());
+                System.out.println("[ Total Pets: " + getPets.petsInstances.size() + " ]");
                 System.out.println();
                 // Create default instances of PetFoodProduct
                 System.out.println("[ Finish Loading Existing Products ]");
@@ -54,6 +58,27 @@ public class WelcomePage {
         System.out.println("9 - Quit");
     }
 
+    public static void showPets(GetPetsInputUseCase getPets, String url) {
+        try (Connection conn = DriverManager.getConnection(url)) {
+            // Set the busy timeout to 30 seconds
+            if (conn.isValid(0)) {
+                conn.createStatement().execute("PRAGMA busy_timeout = 30000");
+            }
+
+            // print existing pets
+            getPets.showExistingPets(conn, getPets, url);
+
+//            // Print the loaded pet details
+//            for (String detail : getPets.petDetails) {
+//                System.out.println(detail);
+//            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void showPantry() {
         System.out.println("_____________Food List_____________");
         System.out.println();
@@ -68,7 +93,7 @@ public class WelcomePage {
     public static void feedPet(String chosenPetName) {
         // Find the chosen pet in theFacadePet list
         FacadePet chosenPet = null;
-        for (FacadePet pet : FacadePet.theFacadePet) {
+        for (FacadePet pet : FacadePet.FacadePetInstances) {
             if (pet.getPetName().equalsIgnoreCase(chosenPetName)) {
                 chosenPet = pet;
                 break;
@@ -98,7 +123,7 @@ public class WelcomePage {
         }
     }
 
-    public static void menu(GetPetsInputUseCase useCase, WelcomePage page, String PPPName) throws IOException {
+    public static void menu(GetPetsInputUseCase getPets, WelcomePage page, String PPPName, String url) throws IOException {
         Scanner scanner = new Scanner(System.in);
         boolean notQuit = true;
 
@@ -124,7 +149,7 @@ public class WelcomePage {
                 case 1:
                     System.out.println("You chose " + choice + " - Show Pets");
                     System.out.println();
-                    useCase.showExistingPets();
+                    showPets(getPets, url);
                     System.out.println();
                     continue;
                 case 2:
@@ -160,7 +185,7 @@ public class WelcomePage {
                             System.out.println("___________________________________");
                             System.out.println();
                             System.out.println("_____________Pet List_____________");
-                            useCase.showExistingPets();
+                            showPets(getPets, url);
 
                             System.out.println();
                             String chosenPetName = scanner.nextLine();
@@ -183,15 +208,28 @@ public class WelcomePage {
         }
 
 
-
     }
 
 
-
     public static void main(String[] args) throws IOException {
+        //path to Database
+        String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/Database/PPP_DB.db";
 
-        GetPetsInputUseCase useCase = new GetPetsInputUseCase();
-        loadData(useCase);
+        //Load datas
+        GetPetsInputUseCase getPets = new GetPetsInputUseCase();
+
+//        //Database connection
+//        System.out.println("Connecting to PPP database...");
+//        try (Connection conn = DriverManager.getConnection(url)) {
+//            // Set the busy timeout to 30 seconds
+//            if (conn.isValid(0)) {
+//                conn.createStatement().execute("PRAGMA busy_timeout = 30000");
+//            }
+//        } catch (SQLException e) {
+//            System.err.println(e.getMessage());
+//        }
+
+        loadData(getPets, url);
         System.out.println("Hi there, what is your name? ");
         Scanner scanner = new Scanner(System.in);
         String userName = scanner.nextLine();
@@ -201,8 +239,8 @@ public class WelcomePage {
         String PPPName = scanner.nextLine();
 
         WelcomePage welcomePage = new WelcomePage();
-        welcomePage.menu(useCase, welcomePage, PPPName);
+        welcomePage.menu(getPets, welcomePage, PPPName, url);
+
+
     }
-
-
 }

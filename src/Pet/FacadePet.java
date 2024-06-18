@@ -1,15 +1,13 @@
 package Pet;
 
 
-import petSupplies.PetFoodProduct;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public abstract class FacadePet extends Thread implements Serializable {
 
     // allows for a centralized management of all action instances.
-    public static ArrayList<FacadePet> theFacadePet = new ArrayList<FacadePet>();
+    public static ArrayList<FacadePet> FacadePetInstances = new ArrayList<FacadePet>();
     public static String type;
 
     private String petName;
@@ -23,7 +21,7 @@ public abstract class FacadePet extends Thread implements Serializable {
         this.age = age;
         //Each Action instance adds itself to the static theActions list upon creation. This static list can be accessed
         // and manipulated by any instance of Action.
-        theFacadePet.add(this);
+        FacadePetInstances.add(this);
     }
 
     //methods

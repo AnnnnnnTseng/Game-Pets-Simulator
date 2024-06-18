@@ -11,9 +11,9 @@ public class PetFoodProduct extends PPPEntity {
 //  public ArrayList<PetFoodBrand> petFoodBrands_ = new ArrayList<>();
   private int size; // Number of grams per bag
 
-  public PetFoodProduct(String aName, int size) {
+  public PetFoodProduct(String ProductName, int size) {
     // POSTCONDITION: thePetFoodProductInstances contains this
-    super(aName);
+    super(ProductName);
     this.size = size;
     thePetFoodProductInstances.add(this);
   }
