@@ -1,9 +1,9 @@
 //package database;
 //import java.sql.*;
 //
-//public class UseDatabase {
+//public class insertPets {
 //
-//    private static void insert(Connection conn) throws SQLException {
+//    private static void insertPets(Connection conn) throws SQLException {
 //        // Update the SQL statement to include only the NOT NULL columns
 //        String sql = "INSERT INTO FacadePet(PetName, type, age) VALUES (?, ?, ?)";
 //        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -55,9 +55,9 @@
 //        }
 //    }
 //    public static void main(String[] args) throws SQLException {
-//        String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/Database/PPP_DB.db";
+//        String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/v6_Project_PPP_SQLite＿CS622 /Database/PPP_DB.db";
 //        try (Connection conn = DriverManager.getConnection(url)) {
-//            insert(conn);
+//            insertPets(conn);
 //            query(conn);
 //        }
 //    }
