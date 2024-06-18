@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/ann/Desktop/BU CS622/Assignment 6/Database/PPP_DB.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1037"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="0" parent="0"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,9:mainFacadePet"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1">-- DROP TABLE FacadePet;
+-- DROP TABLE PetFoodProduct;
+-- 
+-- CREATE TABLE FacadePet (
+-- PetName VARCHAR (64)  PRIMARY KEY,
+-- type VARCHAR (64) NOT NULL,
+-- age INTEGER  NOT NULL,
+-- mood INTEGER,
+-- energyLevel INTEGER
+-- gramsPerFeed INTEGER);
+-- 
+-- CREATE TABLE PetFoodProduct (
+-- ProductName VARCHAR (64) PRIMARY KEY,
+-- size INTEGER NOT NULL);
+
+-- SELECT * FROM FacadePet;
+
+--Create the PetType table
+-- CREATE TABLE PetType (
+--     TypeId VARCHAR(64) PRIMARY KEY NOT NULL,
+--     AnimalType VARCHAR(64) NOT NULL
+-- );
+
+-- Insert values into the PetType table
+-- INSERT INTO PetType (TypeId, AnimalType) VALUES ('D', 'Dog');
+-- INSERT INTO PetType (TypeId, AnimalType) VALUES ('R', 'Rabbit');
+
+-- SELECT * FROM PetType;
+
+
+ALTER TABLE FacadePet
+ADD COLUMN gramsPerFeed INTEGER;</sql><current_tab id="0"/></tab_sql></sqlb_project>

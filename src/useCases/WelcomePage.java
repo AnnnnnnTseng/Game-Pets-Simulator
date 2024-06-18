@@ -177,14 +177,14 @@ public class WelcomePage {
                     continue;
 
                 case 4:
-                    System.out.println("You chose " + choice + " - Feet Pets (You Can Feed Multiple Pets At The Same Time)");
+                    System.out.println("You chose " + choice + " - Feet Pets, You Can Feed Multiple Pets At The Same Time");
 //                    ArrayList<String> chosenPetNames = new ArrayList<>();
                     while (true) {
                         System.out.print("Do you want to feed a new pet now? (Y/N) ");
                         String toFeed = scanner.nextLine();
                         if (toFeed.equalsIgnoreCase("Y")) {
                             // Prompt the user to choose which dog to feed
-                            System.out.println("Which pet do you want to feed?");
+                            System.out.println("Which pet do you want to feed? (Enter Pet Name only.)");
 
                             showPets(getPets, url);
 
@@ -215,33 +215,18 @@ public class WelcomePage {
                         System.out.println("No pets found in the paradise.");
                     }
                     continue;
-
                 default:
                     System.out.println("That's not a valid selection.");
             }
         }
-
-
     }
 
 
     public static void main(String[] args) throws IOException, SQLException {
         //path to Database
-        String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/Database/PPP_DB.db";
-
+        String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/v6_Project_PPP_SQLite＿CS622 /Database/PPP_DB.db";
         //Load datas
         GetPetsInputUseCase getPets = new GetPetsInputUseCase();
-
-//        //Database connection
-//        System.out.println("Connecting to PPP database...");
-//        try (Connection conn = DriverManager.getConnection(url)) {
-//            // Set the busy timeout to 30 seconds
-//            if (conn.isValid(0)) {
-//                conn.createStatement().execute("PRAGMA busy_timeout = 30000");
-//            }
-//        } catch (SQLException e) {
-//            System.err.println(e.getMessage());
-//        }
 
         loadData(getPets, url);
         System.out.println("Hi there, what is your name? ");
@@ -254,7 +239,6 @@ public class WelcomePage {
 
         WelcomePage welcomePage = new WelcomePage();
         welcomePage.menu(getPets, welcomePage, PPPName, url);
-
 
     }
 }
