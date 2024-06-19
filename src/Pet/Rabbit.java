@@ -5,6 +5,7 @@ import petSupplies.PetFoodProduct;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
 public class Rabbit extends FacadePet {
     public static ArrayList<Rabbit> RabbitInstances = new ArrayList();
     public static String type = "Rabbit";
@@ -18,7 +19,7 @@ public class Rabbit extends FacadePet {
     public void getTrain(){
         System.out.println("Training " + this.getPetName() + " makes " + this.getPetName() + " tired");
         System.out.println("Before training: Energy Level - " + this.getEnergyLevel());
-        this.setEnergyLevel(this.getEnergyLevel() - 10);
+        this.modifyEnergyLevel(this.getEnergyLevel() - 10);
         System.out.println("After training: Energy Level - " + this.getEnergyLevel());
     }
 
@@ -34,6 +35,7 @@ public class Rabbit extends FacadePet {
 
             // Check if the food name exists in the list of pet food products
             for (PetFoodProduct product : PetFoodProduct.thePetFoodProductInstances) {
+                System.out.println("New -- Found: " + product.entityName);
                 if (product.entityName.equalsIgnoreCase(foodName)) {
                     food = product;
                     validFood = true;
@@ -41,7 +43,7 @@ public class Rabbit extends FacadePet {
                     System.out.println("----- Feeding " + this.getPetName() + " increase " + this.getPetName() + "'s Energy Level.");
                     System.out.println("----- " + food.entityName + " " + food.getSize() + "g is provided");
                     System.out.println("----- Current energy Level - " + this.getEnergyLevel());
-                    this.setEnergyLevel(food.getSize());;
+                    this.modifyEnergyLevel(food.getSize());;
                     System.out.println("----- Energy Level after eating " + food.entityName + ": " + this.getEnergyLevel());
                     break;
                 }

@@ -6,17 +6,20 @@ import Pet.InteractWith;
 import Pet.Rabbit;
 import petSupplies.PetFoodProduct;
 import users.ParadiseMayor;
+import database.*;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 import java.sql.*;
 
+import static database.FacadePetTable.updatePetEnergy;
+
 public class WelcomePage {
     public WelcomePage() {
     }
 
-    public static void loadData(GetPetsInputUseCase getPets, String url) throws IOException {
+    public static void loadData(PetFoodProductTable food, GetPetsInputUseCase getPets, String url) throws IOException, SQLException {
         Scanner scanner = new Scanner(System.in);
 //        System.out.print("Please do load data before proceeding. Loading now? (Y/N) ");
 //        String choice = scanner.nextLine();
@@ -29,22 +32,22 @@ public class WelcomePage {
                 System.out.println();
 //                getPets.readTextFile(GetPetsInputUseCase.fileName);
 //                getPets.readFromDatabase();
-                getPets.LoadPets(getPets, url);
+                getPets.printReadFromDatabase(getPets, url);
                 System.out.println("[ Finish Reading Existing Pets ]");
                 System.out.println("[ Total Pets: " + getPets.petsInstances.size() + " ]");
                 System.out.println();
                 // Create default instances of PetFoodProduct
+                showPantry(food, url);
                 System.out.println("[ Finish Loading Existing Products ]");
-                System.out.println();
-                System.out.println();
-                PetFoodProduct product = new PetFoodProduct("Royal Canin", 50);
-                PetFoodProduct product2 = new PetFoodProduct("Blue Buffalo", 100);
-                PetFoodProduct product3 = new PetFoodProduct("Hill's Science Diet", 75);
+//                System.out.println();
+//                System.out.println();
+//                PetFoodProduct product = new PetFoodProduct("Royal Canin", 50);
+//                PetFoodProduct product2 = new PetFoodProduct("Blue Buffalo", 100);
+//                PetFoodProduct product3 = new PetFoodProduct("Ant", 75);
                 System.out.println("Welcome to the Pet Pals Paradise.");
                 break;
             } else {
                 System.out.print("Sorry, Pet Pals Paradise game cannot proceed without loading data. ");
-                continue;
             }
         }
     }
@@ -80,19 +83,21 @@ public class WelcomePage {
         }
     }
 
-    public static void showPantry() {
+    public static void showPantry(PetFoodProductTable databaseFood, String url) throws SQLException {
         System.out.println();
         // Access all instances stored in thePetFoodProductInstances
-        System.out.println("All Pet Food Products available:");
-        System.out.println("--------------------------Food List--------------------------");
-        for (PetFoodProduct p : PetFoodProduct.thePetFoodProductInstances) {
-            p.describe();
-        }
-        System.out.println("-------------------------------------------------------------");
-        System.out.println();
-    }
 
-    public static void feedPet(GetPetsInputUseCase getPets, String chosenPetName, String url) throws SQLException {
+        databaseFood.queryAndPrintFoodProducts(url);
+
+//        System.out.println("All Pet Food Products available:");
+//        System.out.println("--------------------------Food List--------------------------");
+//        for (PetFoodProduct p : PetFoodProduct.thePetFoodProductInstances) {
+//            p.describe();
+//        }
+//        System.out.println("-------------------------------------------------------------");
+//        System.out.println();
+    }
+    public static void feedPet(PetFoodProductTable databaseFood, GetPetsInputUseCase getPets, String chosenPetName, String url) throws SQLException {
         // Find the chosen pet in theFacadePet list
         FacadePet chosenPet = null;
         for (FacadePet pet : FacadePet.FacadePetInstances) {
@@ -101,32 +106,31 @@ public class WelcomePage {
                 break;
             }
         }
-
         // If the chosen dog is found, feed it
         if (chosenPet != null) {
             if (chosenPet instanceof Dog) {
                 Dog chosenDog = (Dog) chosenPet;
                 System.out.println("Ready to feed dog " + chosenPetName);
-                showPantry();
+                showPantry(databaseFood, url);
                 InteractWith<Dog> DogInteraction = new InteractWith<>(chosenDog);
                 ParadiseMayor.theParadiseMayor.FeedPet(DogInteraction);
                 ParadiseMayor.theParadiseMayor.ObservePets(DogInteraction);
             } else if (chosenPet instanceof Rabbit) {
                 Rabbit chosenRabbit = (Rabbit) chosenPet;
                 System.out.println("Ready to feed rabbit " + chosenPetName);
-                showPantry();
+                showPantry(databaseFood, url);
                 InteractWith<Rabbit> RabbitInteraction = new InteractWith<>(chosenRabbit);
                 ParadiseMayor.theParadiseMayor.FeedPet(RabbitInteraction);
                 ParadiseMayor.theParadiseMayor.ObservePets(RabbitInteraction);
-
             }
+            updatePetEnergy(url, chosenPet.getPetName(), chosenPet.getEnergyLevel());
         } else {
             System.out.println("Sorry, the specified dog does not exist.");
         }
         getPets.updateDatabaseWithDefaults(getPets.petsInstances, url);
     }
 
-    public static void menu(GetPetsInputUseCase getPets, WelcomePage page, String PPPName, String url) throws IOException, SQLException {
+    public static void menu(PetFoodProductTable databaseFood, GetPetsInputUseCase getPets, WelcomePage page, String PPPName, String url) throws IOException, SQLException {
         Scanner scanner = new Scanner(System.in);
         boolean notQuit = true;
 
@@ -146,7 +150,7 @@ public class WelcomePage {
             }
             switch (choice) {
                 case 9:
-                    System.out.println("You chose " + choice + "Goodbye! Thank you for using the database");
+                    System.out.println("You chose " + choice + " Goodbye! Thank you for visiting Paradise");
                     notQuit = false;
                     break;
                 case 1:
@@ -167,13 +171,17 @@ public class WelcomePage {
                     int productWeight = scanner.nextInt();
 
                     // Add new Product Instance
+//                    System.out.print("Adding Ant2------------------------------------------------");
+//                    PetFoodProduct product3 = new PetFoodProduct("Ant2", 75);
+//                    System.out.print("Adding another");
                     PetFoodProduct newProduct = new PetFoodProduct(productName, productWeight);
+                    databaseFood.addFoodProduct(url, productName, productWeight);
                     System.out.println("[ " + productName + " ] , " + productWeight + "g - has been added to the pantry.");
                     System.out.println();
                     continue;
                 case 3:
                     System.out.println("You chose " + choice + " - Show pet food pantry");
-                    showPantry();
+                    showPantry(databaseFood, url);
                     continue;
 
                 case 4:
@@ -192,7 +200,8 @@ public class WelcomePage {
                             String chosenPetName = scanner.nextLine();
 
 //                            chosenPetNames.add(chosenPetName);
-                            feedPet(getPets, chosenPetName, url);
+                            feedPet(databaseFood, getPets, chosenPetName, url);
+//                            updatePetEnergy(url, chosenPetName, new)
                         } else {
                             System.out.print("Finish choosing pets to feed. Start Feeding!");
                             break;
@@ -210,7 +219,7 @@ public class WelcomePage {
                     // Check if a pet was found and feed it
                     if (petName != null) {
                         System.out.println( "[ " + petName + " ] has the lowest energy level: ");
-                        feedPet(getPets, petName, url);
+                        feedPet(databaseFood, getPets, petName, url);
                     } else {
                         System.out.println("No pets found in the paradise.");
                     }
@@ -220,15 +229,15 @@ public class WelcomePage {
             }
         }
     }
-
-
     public static void main(String[] args) throws IOException, SQLException {
         //path to Database
         String url = "jdbc:sqlite:/Users/ann/Desktop/BU CS622/Assignment 6/v6_Project_PPP_SQLite＿CS622 /Database/PPP_DB.db";
         //Load datas
         GetPetsInputUseCase getPets = new GetPetsInputUseCase();
+        PetFoodProductTable foodDatabase = new PetFoodProductTable();
 
-        loadData(getPets, url);
+
+        loadData(foodDatabase, getPets, url);
         System.out.println("Hi there, what is your name? ");
         Scanner scanner = new Scanner(System.in);
         String userName = scanner.nextLine();
@@ -238,7 +247,7 @@ public class WelcomePage {
         String PPPName = scanner.nextLine();
 
         WelcomePage welcomePage = new WelcomePage();
-        welcomePage.menu(getPets, welcomePage, PPPName, url);
+        welcomePage.menu(foodDatabase, getPets, welcomePage, PPPName, url);
 
     }
 }

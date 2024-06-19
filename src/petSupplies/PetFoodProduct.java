@@ -16,28 +16,28 @@ public class PetFoodProduct extends PPPEntity {
     super(ProductName);
     this.size = size;
     thePetFoodProductInstances.add(this);
+//    System.out.println("Current instances: ");
+//    for (int i = 0; i < thePetFoodProductInstances.size(); i++) {
+//        System.out.println(thePetFoodProductInstances.get(i).entityName);
+//    }
   }
 
   public int getSize() {
       return size;
   }
 
-  public void setSize(int size) {
-      this.size = size;
-  }
-
-
-  public void addFood(String foodName, int foodWeight) {
-    PetFoodProduct newFood = new PetFoodProduct(foodName, foodWeight);
-    System.out.println(newFood.entityName + ", " + newFood.getSize() + "g has been added to the pantry.");
-
-  }
-
+//  public void setSize(int size) {
+//      this.size = size;
+//  }
+//
+//  public void addFood(String foodName, int foodWeight) {
+//    PetFoodProduct newFood = new PetFoodProduct(foodName, foodWeight);
+//    System.out.println(newFood.entityName + ", " + newFood.getSize() + "g has been added to the pantry.");
+//
+//  }
   @Override
   public void describe() {
     System.out.println("Pet Food Product: " + entityName + ", Size: " + size + " grams per bag.");
-    ;
-
   }
 //  public static void main(String[] args) {
 //    // Create instances of PetFoodProduct.

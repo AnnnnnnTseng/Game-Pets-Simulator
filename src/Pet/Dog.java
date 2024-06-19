@@ -20,7 +20,7 @@ public class Dog extends FacadePet {
     public void getTrain() {
         System.out.println("Training " + this.getPetName() + " makes " + this.getPetName() + " tired");
         System.out.println("Before training: Energy Level - " + this.getEnergyLevel());
-        this.setEnergyLevel(this.getEnergyLevel() - 10);
+        this.modifyEnergyLevel(this.getEnergyLevel() - 10);
         System.out.println("After training: Energy Level - " + this.getEnergyLevel());
     }
 
@@ -43,7 +43,7 @@ public class Dog extends FacadePet {
                     System.out.println("----- Feeding " + this.getPetName() + " increase " + this.getPetName() + "'s Energy Level.");
                     System.out.println("----- " + food.entityName + " " + food.getSize() + "g is provided");
                     System.out.println("----- Current energy Level - " + this.getEnergyLevel());
-                    this.setEnergyLevel(food.getSize());;
+                    this.modifyEnergyLevel(food.getSize());;
                     System.out.println("----- Energy Level after eating " + food.entityName + ": " + this.getEnergyLevel());
                     break;
                 }

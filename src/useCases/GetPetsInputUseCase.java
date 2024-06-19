@@ -2,10 +2,7 @@ package useCases;
 
 import Pet.*;
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 
 import java.sql.*;
 import java.util.List;
@@ -40,22 +37,24 @@ public class GetPetsInputUseCase {
 //            }
 //        }
 //    }
-
     // read from Database, and create instances for dog/rabbits
     public void readFromDatabase(Connection conn, String url) throws SQLException {
-        String querySQL = "SELECT PetName, type, age FROM FacadePet ORDER BY age";
+        String querySQL = "SELECT PetName, type, age, energyLevel FROM FacadePet ORDER BY age";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(querySQL)) {
             while (rs.next()) {
                 String type = rs.getString("type");
                 String petName = rs.getString("PetName");
                 int petAge = rs.getInt("age");
+                int energyLevel = rs.getInt("energyLevel");
 
                 if (type.equalsIgnoreCase("R")) {
                     Rabbit rabbit = new Rabbit(petName, petAge);
+                    rabbit.setEnergyLevel(energyLevel);
                     this.petsInstances.add(rabbit);
                 } else if (type.equalsIgnoreCase("D")) {
                     Dog dog = new Dog(petName, petAge);
+                    dog.setEnergyLevel(energyLevel);
                     this.petsInstances.add(dog);
                 }
             }
@@ -64,6 +63,7 @@ public class GetPetsInputUseCase {
         updateDatabaseWithDefaults(petsInstances, url);
     }
 
+    //after create instance, write the default value(energy level...etc)back to DB.
     public void updateDatabaseWithDefaults(ArrayList<FacadePet> petsInstances, String url) throws SQLException {
     String updateSQL = "UPDATE FacadePet SET mood = ?, energyLevel = ?, gramsPerFeed = ? WHERE PetName = ?";
         try (Connection conn = DriverManager.getConnection(url)) {
@@ -83,8 +83,8 @@ public class GetPetsInputUseCase {
             System.err.println(e.getMessage());
         }
     }
-
-    public void LoadPets(GetPetsInputUseCase useDatabase, String url) {
+    //print from petsInstances stored in this class. petInstances stored pets that just loaded and created.
+    public void printReadFromDatabase(GetPetsInputUseCase useDatabase, String url) {
         //Sets up the SQLite database connection.
         try (Connection conn = DriverManager.getConnection(url)) {
             // Set the busy timeout to 30 seconds
@@ -96,6 +96,7 @@ public class GetPetsInputUseCase {
             useDatabase.readFromDatabase(conn, url);
 
             //Optionally, print the loaded pets
+            System.out.println("---------Pet List (young - old)---------");
             for (FacadePet pet : useDatabase.petsInstances) {
                 System.out.printf("%s: %s, %d years old%n",
                     pet instanceof Dog ? "Dog" : "Rabbit", pet.getPetName(), pet.getAge());
@@ -150,7 +151,6 @@ public class GetPetsInputUseCase {
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
-
         // print a existing pets table
         System.out.println("------------------------Pet List------------------------");
         for (String detail : petDetails) {
@@ -158,7 +158,6 @@ public class GetPetsInputUseCase {
         }
         System.out.println("-------------------------------------------------------");
     }
-
     public static String getPetWithMinEnergyLevel(String url) {
         String minEnergySQL = "SELECT PetName FROM FacadePet " +
                               "WHERE energyLevel = (SELECT MIN(energyLevel) FROM FacadePet)";

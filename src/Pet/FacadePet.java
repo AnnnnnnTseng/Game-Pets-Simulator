@@ -1,6 +1,5 @@
 package Pet;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -69,8 +68,10 @@ public abstract class FacadePet extends Thread implements Serializable {
     public int getEnergyLevel() {
         return energyLevel;
     }
-
-    public void setEnergyLevel(int energyTooAdd) {
+    public void setEnergyLevel(int energyLevel) {
+        this.energyLevel = energyLevel;
+    }
+    public void modifyEnergyLevel(int energyTooAdd) {
         this.energyLevel += energyTooAdd;
     }
 
@@ -87,7 +88,8 @@ public abstract class FacadePet extends Thread implements Serializable {
 //        System.out.println(this.petName + " falls asleep");
 //    }
 
-    //Contain the specific code to be executed in a new thread when start() is called on an Action instance.
+    //Contain the specific code to be executed in a new thread when start()
+    // is called on an Action instance.
      public abstract void run();
 
 }

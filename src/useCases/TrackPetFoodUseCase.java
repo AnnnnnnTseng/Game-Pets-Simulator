@@ -44,12 +44,8 @@ public class TrackPetFoodUseCase {
         for (PetFoodProduct product : PetFoodProduct.thePetFoodProductInstances) {
           product.describe();
         }
-
-
         Dog myDog = new Dog("Puffy", 1);
         Rabbit myRabbit = new Rabbit("Mina", 5);
-
-
 //        testConcurrentUseCase inputDogs = new testConcurrentUseCase();
 //        inputDogs.readDogTextFile(fileName);
 //
@@ -58,14 +54,11 @@ public class TrackPetFoodUseCase {
 //        while (dogsIterator.hasNext()) {
 //            Dog dogEntity = (Dog) dogsIterator.next();
 //            System.out.println(dogEntity.getPetName());
-//
 //        }
-
-
 
         InteractWith<Dog> DogInteraction = new InteractWith<>(myDog);
         InteractWith<Rabbit> RabbitInteraction = new InteractWith<>(myRabbit);
-//
+
 //        ParadiseMayor.theParadiseMayor.TrainPet(DogInteraction);
 //        ParadiseMayor.theParadiseMayor.PlayPet(RabbitInteraction);
 //        ParadiseMayor.theParadiseMayor.ObservePets(DogInteraction);
